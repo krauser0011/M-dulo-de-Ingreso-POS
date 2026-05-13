@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo de Cuadre POS | Alimentos Polar</title>
+    <!-- Fuentes inspiradas en plataformas modernas de e-commerce -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* Paleta de colores Polar en Línea */
+            --polar-blue: #003876;
+            --polar-blue-light: #0053b3;
+            --polar-yellow: #FFCC00;
+            --polar-yellow-hover: #e6b800;
+            --bg-body: #f5f7fa;
+            --bg-card: #ffffff;
+            --text-dark: #2d3748;
+            --text-muted: #718096;
+            --border-light: #e2e8f0;
+            --input-bg: #f8fafc;
+            --success: #059669;
+            --danger: #e11d48;
+            --warning: #d97706;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Nunito Sans', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-dark);
+            margin: 0;
+            padding-bottom: 40px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3 { font-family: 'Montserrat', sans-serif; margin: 0; }
+
+        /* --- CABECERA ESTILO E-COMMERCE --- */
+        .topbar {
+            background-color: var(--bg-card);
+            padding: 15px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-bottom: 4px solid var(--polar-yellow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .topbar-logo { height: 48px; object-fit: contain; }
+
+        .topbar-title {
+            color: var(--polar-blue);
+            font-size: 1.2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* --- CONTENEDOR PRINCIPAL --- */
+        .container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 25px;
+            align-items: start;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            padding: 25px;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        .card-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 1.15rem;
+            color: var(--polar-blue);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- PANEL DE CONTROLES E INPUTS --- */
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 25px;
+            background: var(--input-bg);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px dashed var(--border-light);
+        }
+
+        .input-group { display: flex; flex-direction: column; gap: 8px; }
+        
+        .input-group label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border-light);
+            border-radius: 10px;
+            font-family: 'Nunito Sans', sans-serif;
+            font-size: 1rem;
+            color: var(--text-dark);
+            background-color: var(--bg-card);
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--polar-blue);
+            box-shadow: 0 0 0 4px rgba(0, 56, 118, 0.1);
+        }
+
+        .input-total-main {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--polar-blue);
+            text-align: right;
+            background-color: #fff;
+        }
+
+        .input-readonly {
+            background-color: #e2e8f0;
+            color: var(--text-muted);
+            border-color: #cbd5e1;
+            cursor: not-allowed;
+        }
+
+        /* --- TABLA LIMPIA (Estilo E-commerce) --- */
+        .table-responsive { overflow-x: auto; border-radius: 10px; }
+        
+        table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        
+        th {
+            background-color: var(--input-bg);
+            color: var(--polar-blue);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            padding: 15px 12px;
+            text-align: center;
+            border-bottom: 2px solid var(--border-light);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-light);
+            vertical-align: middle;
+            background-color: var(--bg-card);
+        }
+
+        tr:hover td { background-color: #f8fafc; }
+        tr:last-child td { border-bottom: none; }
+
+        .text-left { text-align: left; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+
+        /* Columna de Resultado POS */
+        .highlight-cell {
+            background-color: rgba(255, 204, 0, 0.1);
+            border-left: 2px solid var(--polar-yellow);
+        }
+        
+        .pos-value-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--polar-blue);
+            background: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--polar-yellow);
+            box-shadow: 0 2px 4px rgba(255, 204, 0, 0.15);
+        }
+
+        .cell-subtext {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        /* --- BOTONES --- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 24px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border-radius: 50px; /* Estilo píldora */
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-action {
+            background-color: var(--polar-yellow);
+            color: var(--polar-blue);
+            margin-top: 20px;
+            box-shadow: 0 4px 6px rgba(255, 204, 0, 0.2);
+        }
+
+        .btn-action:hover {
+            background-color: var(--polar-yellow-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(255, 204, 0, 0.3);
+        }
+
+        .btn-delete {
+            background-color: transparent;
+            color: var(--text-muted);
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+        }
+
+        .btn-delete:hover {
+            background-color: #fee2e2;
+            color: var(--danger);
+        }
+
+        /* --- PANEL DE RESUMEN LATERAL --- */
+        .summary-card { position: sticky; top: 100px; }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px dashed var(--border-light);
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        
+        .summary-item:last-of-type { border-bottom: none; }
+        
+        .summary-item span:last-child {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 1.05rem;
+        }
+
+        .summary-grand-total {
+            margin-top: 15px;
+            padding-top: 20px;
+            border-top: 2px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .summary-grand-total span:first-child {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .summary-grand-total span:last-child {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--polar-blue);
+        }
+
+        /* --- INDICADOR DE CUADRE --- */
+        .status-indicator {
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .status-icon { font-size: 2rem; margin-bottom: 5px; }
+        .status-label { font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .status-value { font-family: 'Montserrat', sans-serif; font-size: 1.8rem; font-weight: 700; }
+
+        .is-pending { background-color: #fef3c7; color: var(--warning); border: 1px solid #fde68a; }
+        .is-matched { background-color: #d1fae5; color: var(--success); border: 1px solid #a7f3d0; }
+        .is-error { background-color: #fee2e2; color: var(--danger); border: 1px solid #fecaca; }
+
+        @media (max-width: 1100px) {
+            .container { grid-template-columns: 1fr; }
+            .summary-card { position: static; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="topbar">
+        <img src="https://upload.wikimedia.org/wikipedia/en/thumb/2/29/Logo_Empresas_Polar_%28Venezuela%29.svg/500px-Logo_Empresas_Polar_%28Venezuela%29.svg.png" alt="Empresas Polar" class="topbar-logo">
+        <div class="topbar-title">
+            <i class="fa-solid fa-boxes-stacked"></i> Módulo de Ingreso POS
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <!-- PANEL IZQUIERDO: DETALLE DE PRODUCTOS -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title"><i class="fa-solid fa-receipt"></i> Desglose de Factura</h2>
+            </div>
+            
+            <div class="controls-grid">
+                <div class="input-group">
+                    <label>Total de Factura Física (USD)</label>
+                    <input type="number" id="targetTotal" class="form-input input-total-main" step="0.01" value="8520.50" oninput="calculate()">
+                </div>
+                <div class="input-group">
+                    <label>Verificación de Sistema (USD)</label>
+                    <input type="text" id="currentTotal" class="form-input input-total-main input-readonly" value="$0,00" readonly>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table id="invoiceTable">
+                    <thead>
+                        <tr>
+                            <th width="5%"></th>
+                            <th width="28%" class="text-left">Producto</th>
+                            <th width="14%">Monto Neto ($)</th>
+                            <th width="10%">Cajas</th>
+                            <th width="13%">Tasa IVA</th>
+                            <th width="18%">Costo APP POS</th>
+                            <th width="12%">Línea Fís.</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Filas dinámicas -->
+                    </tbody>
+                </table>
+            </div>
+
+            <button class="btn btn-action" onclick="addRow()">
+                <i class="fa-solid fa-plus"></i> Agregar Producto
+            </button>
+        </div>
+
+        <!-- PANEL DERECHO: CONSOLIDADOS -->
+        <div class="card summary-card">
+            <div class="card-header">
+                <h2 class="card-title"><i class="fa-solid fa-chart-line"></i> Consolidado Fiscal</h2>
+            </div>
+            
+            <div class="summary-item">
+                <span>Base Exenta (0%)</span>
+                <span id="base0">$0,00</span>
+            </div>
+            <div class="summary-item">
+                <span>Base Reducida (8%)</span>
+                <span id="base8">$0,00</span>
+            </div>
+            <div class="summary-item">
+                <span>Base General (16%)</span>
+                <span id="base16">$0,00</span>
+            </div>
+            <div class="summary-item">
+                <span>Total Impuestos</span>
+                <span id="totalTax">$0,00</span>
+            </div>
+            
+            <div class="summary-grand-total">
+                <span>Monto Total Calculado</span>
+                <span id="grandTotal">$0,00</span>
+            </div>
+
+            <div id="statusIndicator" class="status-indicator is-pending">
+                <div class="status-icon" id="statusIcon"><i class="fa-solid fa-scale-unbalanced"></i></div>
+                <div class="status-label" id="statusLabel">Diferencia de Ingreso</div>
+                <div class="status-value" id="differenceAmount">$0,00</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        window.onload = function() { addRow(); };
+
+        function addRow() {
+            const tbody = document.getElementById('tableBody');
+            const row = document.createElement('tr');
+            
+            row.innerHTML = `
+                <td class="text-center">
+                    <button class="btn-delete" onclick="removeRow(this)" title="Quitar producto"><i class="fa-regular fa-trash-can"></i></button>
+                </td>
+                <td>
+                    <input type="text" class="form-input" placeholder="Ej. Harina PAN...">
+                </td>
+                <td>
+                    <input type="number" class="form-input text-right" step="0.01" value="0" oninput="calculate()" onfocus="this.select()">
+                </td>
+                <td>
+                    <input type="number" class="form-input text-center" step="1" value="1" oninput="calculate()" onfocus="this.select()">
+                </td>
+                <td>
+                    <select class="form-input" onchange="calculate()">
+                        <option value="16">16% General</option>
+                        <option value="8">8% Reducido</option>
+                        <option value="0" selected>0% Exento</option>
+                    </select>
+                </td>
+                <td class="highlight-cell">
+                    <div class="pos-value-box">
+                        <span style="color:#a0aec0; font-size:0.9rem;">$</span>
+                        <span class="calc-pos">0,00000</span>
+                    </div>
+                </td>
+                <td class="text-right cell-subtext calc-linea">$0,00</td>
+            `;
+            tbody.appendChild(row);
+            calculate();
+        }
+
+        function removeRow(button) {
+            const row = button.parentElement.parentElement;
+            row.remove();
+            calculate();
+        }
+
+        function formatNumber(num, decimals) {
+            return num.toFixed(decimals).replace('.', ',');
+        }
+
+        function calculate() {
+            const tbody = document.getElementById('tableBody');
+            const rows = tbody.getElementsByTagName('tr');
+            const targetTotal = parseFloat(document.getElementById('targetTotal').value) || 0;
+            
+            let totalBase0 = 0, totalBase8 = 0, totalBase16 = 0;
+            let totalImpuestos = 0, totalFactura = 0;
+
+            for (let i = 0; i < rows.length; i++) {
+                const inputs = rows[i].getElementsByTagName('input');
+                const select = rows[i].getElementsByTagName('select')[0];
+                
+                const neto = parseFloat(inputs[1].value) || 0;
+                const cant = parseFloat(inputs[2].value) || 0;
+                const ivaRate = parseFloat(select.value) / 100;
+
+                const posCell = rows[i].querySelector('.calc-pos');
+                const lineaCell = rows[i].querySelector('.calc-linea');
+
+                if (cant === 0 || neto === 0) {
+                    posCell.innerText = "0,00000";
+                    lineaCell.innerText = "$0,00";
+                    continue;
+                }
+
+                // CÁLCULO PARA LA APP: (Neto / Cajas) * (1 + IVA)
+                const costoFinalAPP = (neto / cant) * (1 + ivaRate);
+                
+                // CÁLCULO DE CONTROL FÍSICO
+                const montoIva = Math.round((neto * ivaRate) * 100) / 100;
+                const totalLineaFisica = neto + montoIva;
+
+                posCell.innerText = formatNumber(costoFinalAPP, 5);
+                lineaCell.innerText = "$" + formatNumber(totalLineaFisica, 2);
+
+                if (select.value === "0") totalBase0 += neto;
+                if (select.value === "8") totalBase8 += neto;
+                if (select.value === "16") totalBase16 += neto;
+                
+                totalImpuestos += montoIva;
+                totalFactura += totalLineaFisica;
+            }
+
+            document.getElementById('base0').innerText = "$" + formatNumber(totalBase0, 2);
+            document.getElementById('base8').innerText = "$" + formatNumber(totalBase8, 2);
+            document.getElementById('base16').innerText = "$" + formatNumber(totalBase16, 2);
+            document.getElementById('totalTax').innerText = "$" + formatNumber(totalImpuestos, 2);
+            document.getElementById('grandTotal').innerText = "$" + formatNumber(totalFactura, 2);
+            document.getElementById('currentTotal').value = "$" + formatNumber(totalFactura, 2);
+
+            // GESTIÓN VISUAL DEL ESTADO DE CUADRE
+            const diff = targetTotal - totalFactura;
+            const diffAbs = Math.abs(diff);
+            
+            const indicator = document.getElementById('statusIndicator');
+            const icon = document.getElementById('statusIcon');
+            const label = document.getElementById('statusLabel');
+            const amount = document.getElementById('differenceAmount');
+            
+            amount.innerText = "$" + formatNumber(diffAbs, 2);
+            indicator.className = 'status-indicator'; 
+
+            if (targetTotal === 0 && totalFactura === 0) {
+                indicator.classList.add('is-pending');
+                icon.innerHTML = '<i class="fa-solid fa-hourglass-half"></i>';
+                label.innerText = 'Esperando Datos';
+            } else if (diffAbs < 0.01) { 
+                indicator.classList.add('is-matched');
+                icon.innerHTML = '<i class="fa-regular fa-circle-check"></i>';
+                label.innerText = 'Factura Cuadrada Exitosamente';
+                amount.innerText = "$0,00";
+            } else if (diff > 0) {
+                indicator.classList.add('is-pending');
+                icon.innerHTML = '<i class="fa-solid fa-arrow-down"></i>';
+                label.innerText = 'Monto Faltante por Cargar';
+            } else {
+                indicator.classList.add('is-error');
+                icon.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+                label.innerText = 'Excedente Detectado';
+            }
+        }
+    </script>
+</body>
+</html>
