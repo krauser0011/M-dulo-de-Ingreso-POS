@@ -1,1 +1,1 @@
-# M-dulo-de-Ingreso-POS
+# Módulo de Ingreso POS
